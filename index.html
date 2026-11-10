@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MorseNet IoT | Smart Morse Code Decoder</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --border: #1f293d;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.35);
+      --amber: #f59e0b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --font-mono: 'Courier New', Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 1px;
+    }
+
+    .brand span {
+      color: var(--accent);
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 3rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    p.lead {
+      color: var(--muted);
+      font-size: 1.15rem;
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+    }
+
+    /* Live Simulator Styles */
+    .key-btn {
+      width: 100%;
+      height: 110px;
+      border-radius: 10px;
+      border: 2px dashed var(--accent);
+      background: rgba(16, 185, 129, 0.05);
+      color: var(--accent);
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.1s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .key-btn:active, .key-btn.active {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 25px var(--accent-glow);
+      transform: scale(0.98);
+    }
+
+    .terminal-box {
+      background: #000;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      border: 1px solid #1f2937;
+      min-height: 80px;
+      word-break: break-all;
+    }
+
+    .terminal-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .terminal-val {
+      color: var(--accent);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    button.btn-util {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      background: #1f2937;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button.btn-util:hover {
+      background: #374151;
+    }
+
+    /* Architecture List */
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #000;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      margin-right: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header>
+    <div class="brand">
+      <span>● --- ●</span> MorseNet IoT
+    </div>
+    <nav>
+      <a href="#simulator">Simulator</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#hardware">Hardware</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="badge"><span class="status-indicator"></span> Edge IoT Device Active</div>
+    <h1>Real-Time <span>Morse Code</span> Decoder System</h1>
+    <p class="lead">
+      An edge-powered IoT solution translating light pulses, audio signals, and physical key presses into clear English characters over MQTT & WebSockets.
+    </p>
+  </section>
+
+  <main class="container">
+    <!-- Live Demo & Simulator -->
+    <div id="simulator" class="grid-2">
+      <!-- Interactive Input -->
+      <div class="card">
+        <h2 class="card-title">📡 Hardware Transmitter Simulator</h2>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
+          Press and tap to signal. Tap quickly for dot (.), hold (>250ms) for dash (-).
+        </p>
+
+        <button id="morseKey" class="key-btn">
+          <span>TAP / HOLD KEY</span>
+          <small style="font-weight: 400; opacity: 0.7;">(Or press Spacebar)</small>
+        </button>
+
+        <div class="btn-group">
+          <button id="addSpaceBtn" class="btn-util">Space Between Letters</button>
+          <button id="clearBtn" class="btn-util">Reset All</button>
+        </div>
+      </div>
+
+      <!-- Realtime Output -->
+      <div class="card">
+        <h2 class="card-title">📟 IoT Telemetry & Output</h2>
+
+        <div class="terminal-box">
+          <div class="terminal-label">Active Morse Buffer</div>
+          <div id="morseBuffer" class="terminal-val">... --- ...</div>
+        </div>
+
+        <div class="terminal-box">
+          <div class="terminal-label">Decoded Plaintext (Edge Decoded)</div>
+          <div id="decodedOutput" class="terminal-val" style="color: #60a5fa; font-size: 1.3rem;">SOS</div>
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted); display: flex; justify-content: space-between;">
+          <span>Latency: <strong style="color:var(--accent);">14 ms</strong></span>
+          <span>Protocol: <strong style="color:var(--amber);">MQTT / WS</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardware & Architecture -->
+    <div id="architecture" class="grid-2">
+      <div class="card">
+        <h2 class="card-title">⚙️ How The IoT Pipeline Works</h2>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>
+            <strong>Pulse Ingestion:</strong>
+            <p style="color: var(--muted); font-size: 0.9rem;">
+              Light pulses (laser/LDR) or push-buttons are sampled by the microcontroller GPIO interrupts.
+            </p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            <strong>Edge Thresholding:</strong>
+            <p style="color: var(--muted); font-size: 0.9rem;">
+              Onboard timing algorithms classify pulses into dots (1 unit) and dashes (3 units).
+            </p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <strong>Decoded Payload Delivery:</strong>
+            <p style="color: var(--muted); font-size: 0.9rem;">
+              Parsed text is rendered on the onboard OLED display and published via MQTT to the web dashboard.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="hardware" class="card">
+        <h2 class="card-title">🧰 Hardware Specifications</h2>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem;">
+          <li>🔹 <strong>MCU:</strong> ESP8266 NodeMCU or ESP32-WROOM</li>
+          <li>🔹 <strong>Sensors:</strong> Light Dependent Resistor (LDR) / Laser Detector</li>
+          <li>🔹 <strong>Display:</strong> 0.96" SSD1306 I2C OLED Display</li>
+          <li>🔹 <strong>Indicators:</strong> Active Piezo Buzzer & 5mm High-Bright LED</li>
+          <li>🔹 <strong>Connectivity:</strong> 2.4 GHz 802.11 b/g/n Wi-Fi</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Morse Code Decoder IoT Project &copy; 2026. Built with ESP32 & WebSockets.</p>
+  </footer>
+
+  <script>
+    // Morse code dictionary
+    const MORSE_MAP = {
+      ".-": "A", "-...": "B", "-.-.": "C", "-..": "D", ".": "E",
+      "..-.": "F", "--.": "G", "....": "H", "..": "I", ".---": "J",
+      "-.-": "K", ".-..": "L", "--": "M", "-.": "N", "---": "O",
+      ".--.": "P", "--.-": "Q", ".-.": "R", "...": "S", "-": "T",
+      "..-": "U", "...-": "V", ".--": "W", "-..-": "X", "-.--": "Y",
+      "--..": "Z", "-----": "0", ".----": "1", "..---": "2", "...--": "3",
+      "....-": "4", ".....": "5", "-....": "6", "--...": "7", "---..": "8",
+      "----.": "9", ".-.-.-": ".", "--..--": ",", "..--..": "?"
+    };
+
+    let pressStartTime = 0;
+    let currentMorse = "";
+    let decodedText = "";
+    const DASH_THRESHOLD_MS = 250;
+
+    const keyBtn = document.getElementById("morseKey");
+    const morseBufferEl = document.getElementById("morseBuffer");
+    const decodedOutputEl = document.getElementById("decodedOutput");
+    const addSpaceBtn = document.getElementById("addSpaceBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // Audio tone generator using Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let osc = null;
+
+    function startTone() {
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      osc = audioCtx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(750, audioCtx.currentTime); // 750 Hz standard sidetone
+      osc.connect(audioCtx.destination);
+      osc.start();
+    }
+
+    function stopTone() {
+      if (osc) {
+        osc.stop();
+        osc.disconnect();
+        osc = null;
+      }
+    }
+
+    function handleDown(e) {
+      if (e) e.preventDefault();
+      if (pressStartTime !== 0) return;
+      pressStartTime = Date.now();
+      keyBtn.classList.add("active");
+      startTone();
+    }
+
+    function handleUp(e) {
+      if (e) e.preventDefault();
+      if (pressStartTime === 0) return;
+      
+      const duration = Date.now() - pressStartTime;
+      pressStartTime = 0;
+      keyBtn.classList.remove("active");
+      stopTone();
+
+      const symbol = duration >= DASH_THRESHOLD_MS ? "-" : ".";
+      currentMorse += symbol;
+      updateDisplay();
+    }
+
+    function commitLetter() {
+      if (!currentMorse) return;
+      const letters = currentMorse.trim().split(" ");
+      const lastToken = letters[letters.length - 1];
+      const char = MORSE_MAP[lastToken] || "";
+      decodedText += char;
+      currentMorse += " ";
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      morseBufferEl.textContent = currentMorse || "(empty)";
+      decodedOutputEl.textContent = decodedText || "(waiting...)";
+    }
+
+    // Button event listeners
+    keyBtn.addEventListener("mousedown", handleDown);
+    window.addEventListener("mouseup", handleUp);
+
+    keyBtn.addEventListener("touchstart", handleDown, { passive: false });
+    window.addEventListener("touchend", handleUp, { passive: false });
+
+    // Keyboard support (Space key)
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target === document.body) {
+        handleDown();
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.code === "Space") {
+        handleUp();
+      }
+    });
+
+    addSpaceBtn.addEventListener("click", () => {
+      commitLetter();
+      decodedText += " ";
+      currentMorse += "/ ";
+      updateDisplay();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      currentMorse = "";
+      decodedText = "";
+      updateDisplay();
+    });
+
+    // Reset initial SOS demo on first interaction
+    keyBtn.addEventListener("click", function firstRun() {
+      currentMorse = "";
+      decodedText = "";
+      updateDisplay();
+      keyBtn.removeEventListener("click", firstRun);
+    });
+  </script>
+</body>
+</html>
