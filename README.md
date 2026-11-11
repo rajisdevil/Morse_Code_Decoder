@@ -346,15 +346,15 @@ Answer: 🎛️ You can modify the BASE_UNIT_MS value in config.h or dynamically
 
 Answer: 🛑 Mechanical switch bounce; ensure software debouncing (15–20 ms) is enabled in firmware or attach a 100 nF capacitor across the switch terminals.
 
-#### Question 3: Why is the ESP32 failing to connect to the Wi-Fi network?
+#### Question 6: Why is the ESP32 failing to connect to the Wi-Fi network?
 
 Answer: 📶 The ESP32 and ESP8266 only support 2.4 GHz Wi-Fi bands; verify your router is not broadcasting solely on 5 GHz.
 
-#### Question 4: Can I use an Arduino Uno instead of an ESP32/ESP8266?
+#### Question 7: Can I use an Arduino Uno instead of an ESP32/ESP8266?
 
 Answer: 🔌 Yes for local buzzer and OLED decoding, but you will need an external network shield (e.g., Ethernet or ESP-01) for MQTT telemetry and web connectivity.
 
-#### Question 5:   How do I fix the OLED screen showing a blank or corrupted display?
+#### Question 8:   How do I fix the OLED screen showing a blank or corrupted display?
 
 Answer: 🔍 Verify that the I2C wiring matches the SDA/SCL pins and confirm that the I2C address is correctly set to 0x3C (or 0x3D) in the firmware setup.
 ## 💬 Feedback
