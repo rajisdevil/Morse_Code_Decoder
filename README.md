@@ -177,17 +177,14 @@ npm install
 
 📶 MQTT Latency: Lightweight JSON payloads reduce transmission latency to under 30 ms over standard Wi-Fi.
 
-## 📄 Licence
-
-⚖️ Released under the MIT License. See LICENSE file for details.
 
 ## 🔗 Related Projects
 
-📻 WebAudio-CW-Generator: Browser-based Morse sound synthesizer.
+[📻 WebAudio-CW-Generator: Browser-based Morse sound synthesizer.](https://github.com/rajisdevil/WebAudio-CW-Generator)
 
-⚡ ESP-MQTT-Base: Reusable lightweight template for ESP8266/ESP32 MQTT nodes.
+[⚡ ESP-MQTT-Base: Reusable lightweight template for ESP8266/ESP32 MQTT nodes.](https://github.com/rajisdevil/ESP-MQTT-Base)
 
-📡 LoRa-Morse-Relay: Long-range off-grid text transmission network.
+[📡 LoRa-Morse-Relay: Long-range off-grid text transmission network.](https://github.com/rajisdevil/LoRa-Morse-Relay)
 
 
 ## 🗺️ Roadmap
@@ -246,7 +243,7 @@ Validates Morse lookup map coverage for all letters A-Z, numbers 0-9, and punctu
   mosquitto_sub -h broker.emqx.io -t iot/morse/decoded
 ```
 ## Demo
-https://youtu.be/w-XwWIdNpXE?si=ZyVHYn02ufMtoKST
+[📡 MorseNet: IoT-Based Optical & Haptic Morse Code Decoder](https://youtu.be/w-XwWIdNpXE?si=ZyVHYn02ufMtoKST)
 ## 💡 Usage / Examples
 
 🆘 Transmitting SOS:
